@@ -1,21 +1,33 @@
 #include <stdio.h>
-
+#include <stdint.h>
 
 int pc = 0;
-int instructionMemory[1024];
-short int DataMemory[2048];
-short int GPRS[64];
-short int SREG;
+short int instructionMemory[1024];
+int8_t DataMemory[2048];
+int8_t GPRS[64];
+int8_t SREG;
+void decode(short int);
+void execute(int,int8_t,int8_t,int);
+void Fetch(){
+    short int instruction=0;
+    for(pc;pc<1024;pc++){
+        instruction=instructionMemory[pc];
+        decode(instruction);
+    }
+}
+void decode(short int instruction){
+    int opcode=((instruction& 0x000000FF) & ob00000000000000001111000000000000)>>12;
+    int R1=((instruction& 0x000000FF) & ob000000000000000000001111111110000000)>>6;
+    int R2=((instruction& 0x000000FF) & ob000000000000000000000000000111111111);
+    int immediate=((instruction& 0x000000FF) & ob000000000000000000000000000111111111);
+    int8_t value1=GPRS[R1];
+    int8_t value2=GPRS[R2];
+    execute(opcode,value1,value2,immediate);
+}
+void execute(int opcode,int8_t value1,int8_t value2,int immediate){
 
-// int Carry_Flag (short int value1, short int value2) {
-//     int temp1 = value1 & 0x000000FF = 0b00000000000000000000000011111011;
-//     int temp2 = value2 & 0x000000FF = 0b00000000000000000000000000000101;
-//     int mask=0b00000000000000000000000100000000;
-//     if( ((temp1 OP temp2) & mask) == MASK) {
-//         return 1;
-//     } else {
-//         return 0;
-//     }
-// }
+}
 
-
+void main(){
+    
+}
