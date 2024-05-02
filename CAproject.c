@@ -16,10 +16,10 @@ void Fetch(){
     }
 }
 void decode(short int instruction){
-    int opcode=((instruction& 0x000000FF) & ob00000000000000001111000000000000)>>12;
-    int R1=((instruction& 0x000000FF) & ob000000000000000000001111111110000000)>>6;
-    int R2=((instruction& 0x000000FF) & ob000000000000000000000000000111111111);
-    int immediate=((instruction& 0x000000FF) & ob000000000000000000000000000111111111);
+    int opcode=((instruction& 0x000000FF) & 0b00000000000000001111000000000000)>>12;
+    int R1=((instruction& 0x000000FF) & 0b000000000000000000001111111110000000)>>6;
+    int R2=((instruction& 0x000000FF) & 0b000000000000000000000000000111111111);
+    int immediate=((instruction& 0x000000FF) & 0b000000000000000000000000000111111111);
     int8_t value1=GPRS[R1];
     int8_t value2=GPRS[R2];
     execute(opcode,value1,value2,immediate);
