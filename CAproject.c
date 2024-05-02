@@ -25,7 +25,9 @@ void decode(short int instruction){
     execute(opcode,value1,value2,immediate);
 }
 void execute(int opcode,int8_t value1,int8_t value2,int immediate){
-
+    switch(opcode){
+        case 0:
+    }
 }
 
 void main(){
