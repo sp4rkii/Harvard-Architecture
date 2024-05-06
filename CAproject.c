@@ -46,23 +46,23 @@ void execute(int opcode,int8_t value1,int8_t value2,int immediate,int R1){
             int8_t temp2 = value2 & 0xFF; // Extract 8-bit value of value2
             carryFlag = (((temp1 + temp2) & carryMask) == carryMask) ? 1 : 0;
             if(carryFlag)
-                SREG = SREG | 0b10000000 ;
+                SREG = SREG | 0b00010000 ;
             // Overflow Flag
             overflowFlag = ((value1 > 0 && value2 > 0 && result < 0) || (value1 < 0 && value2 < 0 && result > 0));
             if(overflowFlag)
-                SREG = SREG | 0b01000000 ;
+                SREG = SREG | 0b00001000 ;
             // Negative Flag
             negativeFlag = (result < 0);
             if(negativeFlag)
-                SREG = SREG | 0b00100000 ;
+                SREG = SREG | 0b00000100 ;
             // Sign Flag
             signFlag = ((negativeFlag ^ overflowFlag) != 0);
             if(signFlag)
-                SREG = SREG | 0b00010000 ;
+                SREG = SREG | 0b00000010 ;
             // Zero Flag
             zeroFlag = (result == 0);
             if(zeroFlag)
-                SREG = SREG | 0b00001000 ;
+                SREG = SREG | 0b00000001 ;
             break;
         case 1: // Subtract Operation
             // Perform subtraction
@@ -71,19 +71,19 @@ void execute(int opcode,int8_t value1,int8_t value2,int immediate,int R1){
             // Overflow Flag
             overflowFlag = ((value1 < 0 && value2 > 0 && result > 0) || (value1 > 0 && value2 < 0 && result < 0));
             if(overflowFlag)
-                SREG = SREG | 0b01000000 ;
+                SREG = SREG | 0b00001000 ;
             // Negative Flag
             negativeFlag = (result < 0);
             if(negativeFlag)
-                SREG = SREG | 0b00100000 ;
+                SREG = SREG | 0b00000100 ;
             // Sign Flag
             signFlag = ((negativeFlag ^ overflowFlag) != 0);
             if(signFlag)
-                SREG = SREG | 0b00010000 ;
+                SREG = SREG | 0b00000010 ;
             // Zero Flag
             zeroFlag = (result == 0);
             if(zeroFlag)
-                SREG = SREG | 0b00001000 ;
+                SREG = SREG | 0b00000001 ;
             break;
         case 2: // Multiply Operation
             // Perform multiplication
@@ -92,11 +92,11 @@ void execute(int opcode,int8_t value1,int8_t value2,int immediate,int R1){
             // Negative Flag
             negativeFlag = (result < 0);
             if(negativeFlag)
-                SREG = SREG | 0b00100000 ;
+                SREG = SREG | 0b00000100 ;
             // Zero Flag
             zeroFlag = (result == 0);
             if(zeroFlag)
-                SREG = SREG | 0b00001000 ;
+                SREG = SREG | 0b00000001 ;
             break;
         case 3: // Load Immediate Operation
             // Load immediate value into register
@@ -116,11 +116,11 @@ void execute(int opcode,int8_t value1,int8_t value2,int immediate,int R1){
             // Negative Flag
             negativeFlag = (result < 0);
             if(negativeFlag)
-                SREG = SREG | 0b00100000 ;
+                SREG = SREG | 0b00000100 ;
             // Zero Flag
             zeroFlag = (result == 0);
             if(zeroFlag)
-                SREG = SREG | 0b00001000 ;
+                SREG = SREG | 0b00000001 ;
             break;
         case 6: // OR Operation
             // Perform bitwise OR operation
@@ -129,11 +129,11 @@ void execute(int opcode,int8_t value1,int8_t value2,int immediate,int R1){
             // Negative Flag
             negativeFlag = (result < 0);
             if(negativeFlag)
-                SREG = SREG | 0b00100000 ;
+                SREG = SREG | 0b00000100 ;
             // Zero Flag
             zeroFlag = (result == 0);
             if(zeroFlag)
-                SREG = SREG | 0b00001000 ;
+                SREG = SREG | 0b00000001 ;
             break;
         case 7: // JUMP register Operation
             // Jump to the address stored in the given register
@@ -147,11 +147,11 @@ void execute(int opcode,int8_t value1,int8_t value2,int immediate,int R1){
             // Negative Flag
             negativeFlag = (result < 0);
             if(negativeFlag)
-                SREG = SREG | 0b00100000 ;
+                SREG = SREG | 0b00000100 ;
             // Zero Flag
             zeroFlag = (result == 0);
             if(zeroFlag)
-                SREG = SREG | 0b00001000 ;
+                SREG = SREG | 0b00000001 ;
             break;
         case 9: // Shift Right Circular Operation
             // Perform circular right shift operation
@@ -160,11 +160,11 @@ void execute(int opcode,int8_t value1,int8_t value2,int immediate,int R1){
             // Negative Flag
             negativeFlag = (result < 0);
             if(negativeFlag)
-                SREG = SREG | 0b00100000 ;
+                SREG = SREG | 0b00000100 ;
             // Zero Flag
             zeroFlag = (result == 0);
             if(zeroFlag)
-                SREG = SREG | 0b00001000 ;
+                SREG = SREG | 0b00000001 ;
             break;
         case 10: // LOAD Byte Operation
             // Load byte from Data Memory
