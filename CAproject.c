@@ -8,40 +8,43 @@ short int instructionMemory[1024];
 int8_t DataMemory[2048];
 int8_t GPRS[64];
 int8_t SREG;
-void decode(short int);
-void execute(int, int8_t, int8_t, int, int);
-void Fetch()
+int* decode(short int);
+void execute(int value[4]);
+short int Fetch()
 {
-    short int instruction = 0;
-    for (pc; pc < 34; pc++)
-    {
-        instruction = instructionMemory[pc];
-        decode(instruction);
-    }
+         return instructionMemory[pc];
 }
-void decode(short int instruction)
-{
-    int opcode = (instruction & 0b1111000000000000) >> 12;
-    int R1 = (instruction  & 0b0000111111000000) >> 6;
-    int R2 = (instruction  & 0b0000000000111111);
-    int immediate = (instruction  & 0b0000000000111111);
-    int8_t value1 = GPRS[R1];
-    int8_t value2 = GPRS[R2];
+
+int* decode(short int instruction)
+{   static int value[4];
+    if(instruction== NULL){
+        return NULL;
+    }
+    value[0] = (instruction & 0b1111000000000000) >> 12;
+    value[1] = (instruction  & 0b0000111111000000) >> 6;
+    value[2] = (instruction  & 0b0000000000111111);
+    value[3] = (instruction  & 0b0000000000111111);
+    int8_t value1 = GPRS[value[1]];
+    int8_t value2 = GPRS[value[2]];
     printf("Instruction %i\n", pc);
-    printf("opcode = %i\n", opcode);
-    printf("R1 = %i\n", R1);
-    printf("R2 = %i\n", R2);
-    printf("immediate = %i\n", immediate);
+    printf("opcode = %i\n", value[0]);
+    printf("R1 = %i\n", value[1]);
+    printf("R2 = %i\n", value[2]);
+    printf("immediate = %i\n", value[3]);
     printf("value[R1] = %i\n", value1);
     printf("value[R2] = %i\n", value2);
     printf("---------- \n");
-    execute(opcode, value1, value2, immediate, R1);
+    execute(value);
     printf("---------- \n");
+    return value;
 }
-void execute(int opcode, int8_t value1, int8_t value2, int immediate, int R1)
-{
 
+void execute(int value[4])
+{
+    if(value[0]!=NULL){
     int8_t result;
+    int8_t value1 = GPRS[value[1]];
+    int8_t value2 = GPRS[value[2]];
     SREG = 0b00000000;
 
     int carryFlag = 0;
@@ -50,7 +53,7 @@ void execute(int opcode, int8_t value1, int8_t value2, int immediate, int R1)
     int signFlag = 0;
     int zeroFlag = 0;
 
-    switch (opcode)
+    switch (value[0])
     {
     case 0: // ADD Operation
         // Perform addition
@@ -116,14 +119,14 @@ void execute(int opcode, int8_t value1, int8_t value2, int immediate, int R1)
         break;
     case 3: // Load Immediate Operation
         // Load immediate value into register
-        GPRS[R1] = immediate;
+        GPRS[value[1]] = value[3];
         // No flags are affected
         break;
     case 4: // Branch If Equal Zero Operation
         if (value1 == 0)
         {
             // Update PC to immediate value
-            pc = pc + immediate; // Not PC + 1 because it is already incremented in fetch()
+            pc = pc + value[3]; // Not PC + 1 because it is already incremented in fetch()
         }
         break;
     case 5: // AND Operation
@@ -158,8 +161,8 @@ void execute(int opcode, int8_t value1, int8_t value2, int immediate, int R1)
         break;
     case 8: // Shift Left Circular Operation
         // Perform circular left shift operation
-        result = (value1 << immediate) | (value1 >> (8 - immediate));
-        result &= ~(0xFF << (8 - immediate)); // Clear any sign bits
+        result = (value1 << value[3]) | (value1 >> (8 - value[3]));
+        result &= ~(0xFF << (8 - value[3])); // Clear any sign bits
         // Update flags
         // Negative Flag
         negativeFlag = (result < 0);
@@ -172,7 +175,7 @@ void execute(int opcode, int8_t value1, int8_t value2, int immediate, int R1)
         break;
     case 9: // Shift Right Circular Operation
         // Perform circular right shift operation
-        result = (value1 >> immediate) & ~(0xFF << (8 - immediate)) | (value1 << (8 - immediate));
+        result = (value1 >> value[3]) & ~(0xFF << (8 - value[3])) | (value1 << (8 - value[3]));
         // Update flags
         // Negative Flag
         negativeFlag = (result < 0);
@@ -185,25 +188,26 @@ void execute(int opcode, int8_t value1, int8_t value2, int immediate, int R1)
         break;
     case 10: // LOAD Byte Operation
         // Load byte from Data Memory
-        GPRS[R1] = DataMemory[immediate];
+        GPRS[value[1]] = DataMemory[value[3]];
         // No flags are affected
         break;
     case 11: // Store Byte Operation
         // Store byte to Data Memory
-        DataMemory[immediate] = value1;
+        DataMemory[value[3]] = value1;
         // No flags are affected
         break;
     default:
         printf("Invalid OPCode\n");
         break;
     }
-    if (opcode >= 0 && opcode <= 2 || opcode == 5 || opcode == 6 || opcode == 8 || opcode == 9)
+    if (value[0] >= 0 && value[0] <= 2 || value[0] == 5 || value[0] == 6 || value[0] == 8 || value[0] == 9)
     {
 
         // Write the result back to the destination register
-        GPRS[R1] = result;
+        GPRS[value[1]] = result;
     }
     printf("SREG = %i\n", SREG);
+    }
 }
 
 char binaryString[7];
@@ -385,6 +389,17 @@ int LoadInstruction()
     }
     fclose(file);
 }
+void pipeline(){
+    short int instruction=NULL;
+    int* value=NULL;
+     for (pc; pc < 34; pc++)
+    {
+        execute(value);
+        value=decode(instruction);
+        instruction=Fetch();
+    }
+
+}
 
 int main()
 {
@@ -393,7 +408,7 @@ int main()
     {
         printf("Instruction %d is : %d\n", i, instructionMemory[i]);
     }
-    Fetch();
+    pipeline();
      for (int i = 0; i < 35; i++)
     {
         printf("Register Value %d is : %d\n", i, GPRS[i]);
