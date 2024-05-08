@@ -8,15 +8,18 @@ short int instructionMemory[1024];
 int8_t DataMemory[2048];
 int8_t GPRS[64];
 int8_t SREG;
-int* decode(short int);
+short int instruction=NULL;
+int j=0;
+int value[4]={-1,0,0,0};
+void decode(short int);
 void execute(int value[4]);
 short int Fetch()
 {
          return instructionMemory[pc];
 }
 
-int* decode(short int instruction)
-{   static int value[4];
+void decode(short int instruction)
+{   
     if(instruction== NULL){
         return NULL;
     }
@@ -34,19 +37,17 @@ int* decode(short int instruction)
     printf("value[R1] = %i\n", value1);
     printf("value[R2] = %i\n", value2);
     printf("---------- \n");
-    execute(value);
-    printf("---------- \n");
-    return value;
+    
 }
 
 void execute(int value[4])
 {
-    if(value[0]!=NULL){
+    if(value[0]!=-1){
     int8_t result;
     int8_t value1 = GPRS[value[1]];
     int8_t value2 = GPRS[value[2]];
     SREG = 0b00000000;
-
+    printf("---------- \n");
     int carryFlag = 0;
     int overflowFlag = 0;
     int negativeFlag = 0;
@@ -253,7 +254,7 @@ int LoadInstruction()
         printf("Error opening file");
         return 0;
     }
-    int j = 0;
+    
     while (fgets(line, sizeof(line), file))
     {
         // printf("line: %s ",line);
@@ -390,12 +391,12 @@ int LoadInstruction()
     fclose(file);
 }
 void pipeline(){
-    short int instruction=NULL;
-    int* value=NULL;
-     for (pc; pc < 34; pc++)
-    {
+    
+     for (pc; pc < j+1; pc++)
+    {   
+
         execute(value);
-        value=decode(instruction);
+        decode(instruction);
         instruction=Fetch();
     }
 
@@ -404,12 +405,12 @@ void pipeline(){
 int main()
 {
     LoadInstruction();
-    for (int i = 0; i < 35; i++)
+    for (int i = 0; i < j+1; i++)
     {
         printf("Instruction %d is : %d\n", i, instructionMemory[i]);
     }
     pipeline();
-     for (int i = 0; i < 35; i++)
+     for (int i = 0; i < j+1; i++)
     {
         printf("Register Value %d is : %d\n", i, GPRS[i]);
     }
