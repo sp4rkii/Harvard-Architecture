@@ -11,22 +11,24 @@ int8_t GPRS[64];
 int8_t SREG;
 short int instruction=NULL;
 int j=0;
+bool empty=false;;
 int value[4]={-1,0,0,0};
 char *String;
 void decode(short int);
 void execute(int value[4]);
 void Fetch()
 {        
-        if(pc>6){
-            instruction= NULL;
+        if(instructionMemory[pc]==-4096){
+            empty=true;
+            instruction=NULL;
         }
         //  strncpy(String, "Instruction %d executed \n",pc);
+        
         else{
-        printf("Intruction %d fetched.\n",pc+1);
-
          instruction= instructionMemory[pc];
-        //  pc++;
+         printf("Intruction %d fetched.\n",pc+1);
         }
+        //  pc++;
          pc++;
 }
 
@@ -260,6 +262,9 @@ short int binaryToShort(char *binaryString) {
 
 int LoadInstruction()
 {
+      for (int i = 0; i < 1024; i++) {
+        instructionMemory[i] = -4096;
+    }
     FILE *file;
     char line[256];
     char *split;
@@ -408,14 +413,24 @@ int LoadInstruction()
     fclose(file);
 }
 void pipeline(){
-  
-     for (pc; pc < 9;)
+    bool empty2=false;
+    bool empty3=false;
+    for (pc; pc < 1024;)
     {   
         printf("Cycle %d :\n",pc+1);
         // strncpy(String, "Cycle %d : \n",pc);
         execute(value);
         decode(instruction);
         Fetch();
+        if(empty){
+          if(empty2){
+            if(empty3){
+                return 0;
+            }
+            empty3=true;
+          }
+          empty2=true;
+        }
     }
     //  printf("%s\n", String);
 }
@@ -428,9 +443,12 @@ int main()
     //     printf("Instruction %d is : %d\n", i, instructionMemory[i]);
     // }
     pipeline();
-    //  for (int i = 0; i < j+1; i++)
-    // {
-    //     printf("Register Value %d is : %d\n", i, GPRS[i]);
-    // }
-    
+     for (int i = 0; i < j+1; i++)
+    {
+        printf("Register Value %d is : %d\n", i, GPRS[i]);
+    }
+   const char* emptyStr = empty ? "true" : "false";
+
+    // Print the string representation
+    printf("%s\n", emptyStr);
 }
