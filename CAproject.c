@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h> 
 
 int pc = 0;
 short int instructionMemory[1024];
@@ -11,33 +12,47 @@ int8_t SREG;
 short int instruction=NULL;
 int j=0;
 int value[4]={-1,0,0,0};
+char *String;
 void decode(short int);
 void execute(int value[4]);
-short int Fetch()
-{
-         return instructionMemory[pc];
+void Fetch()
+{        
+        if(pc>6){
+            instruction= NULL;
+        }
+        //  strncpy(String, "Instruction %d executed \n",pc);
+        else{
+        printf("Intruction %d fetched.\n",pc+1);
+
+         instruction= instructionMemory[pc];
+        //  pc++;
+        }
+         pc++;
 }
 
 void decode(short int instruction)
 {   
-    if(instruction== NULL){
-        return NULL;
+    if(instruction==NULL){
+        value[0]=-1;
     }
+    else{
+    printf("Intruction %d decoded.\n",pc);
     value[0] = (instruction & 0b1111000000000000) >> 12;
     value[1] = (instruction  & 0b0000111111000000) >> 6;
     value[2] = (instruction  & 0b0000000000111111);
     value[3] = (instruction  & 0b0000000000111111);
     int8_t value1 = GPRS[value[1]];
     int8_t value2 = GPRS[value[2]];
-    printf("Instruction %i\n", pc);
-    printf("opcode = %i\n", value[0]);
-    printf("R1 = %i\n", value[1]);
-    printf("R2 = %i\n", value[2]);
-    printf("immediate = %i\n", value[3]);
-    printf("value[R1] = %i\n", value1);
-    printf("value[R2] = %i\n", value2);
-    printf("---------- \n");
-    
+    // printf("Instruction %i\n", pc);
+    // printf("opcode = %i\n", value[0]);
+    // printf("R1 = %i\n", value[1]);
+    // printf("R2 = %i\n", value[2]);
+    // printf("immediate = %i\n", value[3]);
+    // printf("value[R1] = %i\n", value1);
+    // printf("value[R2] = %i\n", value2);
+    // printf("---------- \n");
+    // strncpy(String, "Instruction %d executed \n",pc);
+    }
 }
 
 void execute(int value[4])
@@ -47,7 +62,7 @@ void execute(int value[4])
     int8_t value1 = GPRS[value[1]];
     int8_t value2 = GPRS[value[2]];
     SREG = 0b00000000;
-    printf("---------- \n");
+    // printf("---------- \n");
     int carryFlag = 0;
     int overflowFlag = 0;
     int negativeFlag = 0;
@@ -207,7 +222,9 @@ void execute(int value[4])
         // Write the result back to the destination register
         GPRS[value[1]] = result;
     }
-    printf("SREG = %i\n", SREG);
+     printf("Intruction %d executed.\n",pc-1);
+    // printf("SREG = %i\n", SREG);
+    // strncpy(String, "Instruction %d executed \n",pc);
     }
 }
 
@@ -391,28 +408,29 @@ int LoadInstruction()
     fclose(file);
 }
 void pipeline(){
-    
-     for (pc; pc < j+1; pc++)
+  
+     for (pc; pc < 9;)
     {   
-
+        printf("Cycle %d :\n",pc+1);
+        // strncpy(String, "Cycle %d : \n",pc);
         execute(value);
         decode(instruction);
-        instruction=Fetch();
+        Fetch();
     }
-
+    //  printf("%s\n", String);
 }
 
 int main()
 {
     LoadInstruction();
-    for (int i = 0; i < j+1; i++)
-    {
-        printf("Instruction %d is : %d\n", i, instructionMemory[i]);
-    }
+    // for (int i = 0; i < j+1; i++)
+    // {
+    //     printf("Instruction %d is : %d\n", i, instructionMemory[i]);
+    // }
     pipeline();
-     for (int i = 0; i < j+1; i++)
-    {
-        printf("Register Value %d is : %d\n", i, GPRS[i]);
-    }
+    //  for (int i = 0; i < j+1; i++)
+    // {
+    //     printf("Register Value %d is : %d\n", i, GPRS[i]);
+    // }
     
 }
