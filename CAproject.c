@@ -78,10 +78,7 @@ void execute(int value[4])
         result = value1 + value2;
         // Update flags
         // Carry Flag
-        int8_t carryMask = 0x100;     // Mask to isolate the 9th bit
-        int8_t temp1 = value1 & 0xFF; // Extract 8-bit value of value1
-        int8_t temp2 = value2 & 0xFF; // Extract 8-bit value of value2
-        carryFlag = (((temp1 + temp2) & carryMask) == carryMask) ? 1 : 0;
+        carryFlag = (((uint16_t)value1 + (uint16_t)value2) > UINT8_MAX);
         if (carryFlag)
             SREG = SREG | 0b00010000;
         // Overflow Flag
