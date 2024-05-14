@@ -12,8 +12,9 @@ int8_t SREG;
 short int instruction=NULL;
 int j=0;
 bool empty=false;;
-int value[4]={-1,0,0,0};
+int value[6]={-1,0,0,0,0,0};
 char *String;
+bool branch;
 void decode(short int);
 void execute(int value[4]);
 void Fetch()
@@ -43,15 +44,15 @@ void decode(short int instruction)
     value[1] = (instruction  & 0b0000111111000000) >> 6;
     value[2] = (instruction  & 0b0000000000111111);
     value[3] = (instruction  & 0b0000000000111111);
-    int8_t value1 = GPRS[value[1]];
-    int8_t value2 = GPRS[value[2]];
+    value[4] = GPRS[value[1]];
+    value[5] = GPRS[value[2]];
     // printf("Instruction %i\n", pc);
     // printf("opcode = %i\n", value[0]);
     // printf("R1 = %i\n", value[1]);
     // printf("R2 = %i\n", value[2]);
     // printf("immediate = %i\n", value[3]);
-    // printf("value[R1] = %i\n", value1);
-    // printf("value[R2] = %i\n", value2);
+    // printf("value[R1] = %i\n", value[4]);
+    // printf("value[R2] = %i\n", value[5]);
     // printf("---------- \n");
     // strncpy(String, "Instruction %d executed \n",pc);
     }
@@ -61,8 +62,6 @@ void execute(int value[4])
 {
     if(value[0]!=-1){
     int8_t result;
-    int8_t value1 = GPRS[value[1]];
-    int8_t value2 = GPRS[value[2]];
     SREG = 0b00000000;
     // printf("---------- \n");
     int carryFlag = 0;
@@ -70,22 +69,22 @@ void execute(int value[4])
     int negativeFlag = 0;
     int signFlag = 0;
     int zeroFlag = 0;
-
+     printf("Intruction %d executed.\n",pc-1);
     switch (value[0])
     {
     case 0: // ADD Operation
         // Perform addition
-        result = value1 + value2;
+        result = value[4] + value[5];
         // Update flags
         // Carry Flag
         int8_t carryMask = 0x100;     // Mask to isolate the 9th bit
-        int8_t temp1 = value1 & 0xFF; // Extract 8-bit value of value1
-        int8_t temp2 = value2 & 0xFF; // Extract 8-bit value of value2
+        int8_t temp1 = value[4] & 0xFF; // Extract 8-bit value of value[4]
+        int8_t temp2 = value[5] & 0xFF; // Extract 8-bit value of value[5]
         carryFlag = (((temp1 + temp2) & carryMask) == carryMask) ? 1 : 0;
         if (carryFlag)
             SREG = SREG | 0b00010000;
         // Overflow Flag
-        overflowFlag = ((value1 > 0 && value2 > 0 && result < 0) || (value1 < 0 && value2 < 0 && result > 0));
+        overflowFlag = ((value[4] > 0 && value[5] > 0 && result < 0) || (value[4] < 0 && value[5] < 0 && result > 0));
         if (overflowFlag)
             SREG = SREG | 0b00001000;
         // Negative Flag
@@ -103,10 +102,10 @@ void execute(int value[4])
         break;
     case 1: // Subtract Operation
         // Perform subtraction
-        result = value1 - value2;
+        result = value[4] - value[5];
         // Update flags
         // Overflow Flag
-        overflowFlag = ((value1 < 0 && value2 > 0 && result > 0) || (value1 > 0 && value2 < 0 && result < 0));
+        overflowFlag = ((value[4] < 0 && value[5] > 0 && result > 0) || (value[4] > 0 && value[5] < 0 && result < 0));
         if (overflowFlag)
             SREG = SREG | 0b00001000;
         // Negative Flag
@@ -124,7 +123,7 @@ void execute(int value[4])
         break;
     case 2: // Multiply Operation
         // Perform multiplication
-        result = value1 * value2;
+        result = value[4] * value[5];
         // Update flags
         // Negative Flag
         negativeFlag = (result < 0);
@@ -141,15 +140,16 @@ void execute(int value[4])
         // No flags are affected
         break;
     case 4: // Branch If Equal Zero Operation
-        if (value1 == 0)
+        if (value[4] == 0)
         {
             // Update PC to immediate value
             pc = pc + value[3]; // Not PC + 1 because it is already incremented in fetch()
+            branch=true;
         }
         break;
     case 5: // AND Operation
         // Perform bitwise AND operation
-        result = value1 & value2;
+        result = value[4] & value[5];
         // Update flags
         // Negative Flag
         negativeFlag = (result < 0);
@@ -162,7 +162,7 @@ void execute(int value[4])
         break;
     case 6: // OR Operation
         // Perform bitwise OR operation
-        result = value1 | value2;
+        result = value[4] | value[5];
         // Update flags
         // Negative Flag
         negativeFlag = (result < 0);
@@ -175,11 +175,12 @@ void execute(int value[4])
         break;
     case 7: // JUMP register Operation
         // Jump to the address stored in the given register
-        pc = value1 || value2;
+        pc = value[4] || value[5];
+        branch=true;
         break;
     case 8: // Shift Left Circular Operation
         // Perform circular left shift operation
-        result = (value1 << value[3]) | (value1 >> (8 - value[3]));
+        result = (value[4] << value[3]) | (value[4] >> (8 - value[3]));
         result &= ~(0xFF << (8 - value[3])); // Clear any sign bits
         // Update flags
         // Negative Flag
@@ -193,7 +194,7 @@ void execute(int value[4])
         break;
     case 9: // Shift Right Circular Operation
         // Perform circular right shift operation
-        result = (value1 >> value[3]) & ~(0xFF << (8 - value[3])) | (value1 << (8 - value[3]));
+        result = (value[4] >> value[3]) & ~(0xFF << (8 - value[3])) | (value[4] << (8 - value[3]));
         // Update flags
         // Negative Flag
         negativeFlag = (result < 0);
@@ -211,7 +212,7 @@ void execute(int value[4])
         break;
     case 11: // Store Byte Operation
         // Store byte to Data Memory
-        DataMemory[value[3]] = value1;
+        DataMemory[value[3]] = value[4];
         // No flags are affected
         break;
     default:
@@ -224,7 +225,7 @@ void execute(int value[4])
         // Write the result back to the destination register
         GPRS[value[1]] = result;
     }
-     printf("Intruction %d executed.\n",pc-1);
+
     // printf("SREG = %i\n", SREG);
     // strncpy(String, "Instruction %d executed \n",pc);
     }
@@ -415,17 +416,32 @@ int LoadInstruction()
 void pipeline(){
     bool empty2=false;
     bool empty3=false;
-    for (pc; pc < 1024;)
+    int i=1;
+    for (pc; pc < 1024;i++)
     {   
-        printf("Cycle %d :\n",pc+1);
+        printf("Cycle %d :\n",i);
         // strncpy(String, "Cycle %d : \n",pc);
-        execute(value);
-        decode(instruction);
+        if (!branch)
+        {
+            execute(value);
+        }
+        else{
+            branch=false;
+        }
+        
+        // if(branch){
+        //     branch=false;
+        //     Fetch();
+        // }
+        if (!branch)
+        {
+            decode(instruction);
+        }
         Fetch();
         if(empty){
           if(empty2){
             if(empty3){
-                return 0;
+               break;
             }
             empty3=true;
           }
@@ -438,10 +454,10 @@ void pipeline(){
 int main()
 {
     LoadInstruction();
-    // for (int i = 0; i < j+1; i++)
-    // {
-    //     printf("Instruction %d is : %d\n", i, instructionMemory[i]);
-    // }
+    for (int i = 0; i < j+1; i++)
+    {
+        printf("Instruction %d is : %d\n", i, instructionMemory[i]);
+    }
     pipeline();
      for (int i = 0; i < j+1; i++)
     {
