@@ -497,7 +497,7 @@ void pipeline()
          printf("Register Value %d is : %d\n", i, GPRS[i]);
      }
      printf("PC value : %d\n",pc);
-     printf("Last SREG valie : %d\n",SREG);
+     printf("Last SREG value : %d\n",SREG);
 
     // Instruction Prints
      for (int i = 0; i < j+1; i++)
