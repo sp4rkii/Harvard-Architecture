@@ -16,7 +16,7 @@ int value[6] = {-1, 0, 0, 0, 0, 0};
 char *String;
 bool branch;
 void decode(short int);
-void execute(int value[4]);
+void execute(int value[6]);
 void Fetch()
 {
     if (instructionMemory[pc] == -4096)
