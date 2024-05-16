@@ -44,17 +44,17 @@ void decode(short int instruction)
     else
     {
         printf("Intruction %d decoded.\n", pc);
-        //Opcode
+        // Opcode
         value[0] = (instruction & 0b1111000000000000) >> 12;
-        //R1
+        // R1
         value[1] = (instruction & 0b0000111111000000) >> 6;
-        //R2
+        // R2
         value[2] = (instruction & 0b0000000000111111);
-        //Immediate
+        // Immediate
         value[3] = (instruction & 0b0000000000111111);
-        //value inside register R1
+        // value inside register R1
         value[4] = GPRS[value[1]];
-        //value inside register R2
+        // value inside register R2
         value[5] = GPRS[value[2]];
         // printf("Instruction %i\n", pc);
         printf("---------- \n");
@@ -75,7 +75,7 @@ void execute(int value[6])
     {
         int8_t result;
         SREG = 0b00000000;
-        
+
         int carryFlag = 0;
         int overflowFlag = 0;
         int negativeFlag = 0;
@@ -88,7 +88,7 @@ void execute(int value[6])
         case 0: // ADD Operation
             // Perform addition
             result = value[4] + value[5];
-            printf("Register %d updated, new value : %d.\n",value[1],result);
+            printf("Register %d updated, new value : %d.\n", value[1], result);
             // Update flags
             // Carry Flag
             carryFlag = (((uint16_t)value[4] + (uint16_t)value[5]) > UINT8_MAX);
@@ -114,7 +114,7 @@ void execute(int value[6])
         case 1: // Subtract Operation
             // Perform subtraction
             result = value[4] - value[5];
-            printf("Register %d updated, new value : %d.\n",value[1],result);
+            printf("Register %d updated, new value : %d.\n", value[1], result);
             // Update flags
             // Overflow Flag
             overflowFlag = ((value[4] < 0 && value[5] > 0 && result > 0) || (value[4] > 0 && value[5] < 0 && result < 0));
@@ -136,7 +136,7 @@ void execute(int value[6])
         case 2: // Multiply Operation
             // Perform multiplication
             result = value[4] * value[5];
-            printf("Register %d updated, new value : %d.\n",value[1],result);
+            printf("Register %d updated, new value : %d.\n", value[1], result);
             // Update flags
             // Negative Flag
             negativeFlag = (result < 0);
@@ -150,7 +150,7 @@ void execute(int value[6])
         case 3: // Load Immediate Operation
             // Load immediate value into register
             GPRS[value[1]] = value[3];
-            printf("Register %d Loaded with value : %d.\n",value[1],value[3]);
+            printf("Register %d Loaded with value : %d.\n", value[1], value[3]);
             // No flags are affected
             break;
         case 4: // Branch If Equal Zero Operation
@@ -164,7 +164,7 @@ void execute(int value[6])
         case 5: // AND Operation
             // Perform bitwise AND operation
             result = value[4] & value[5];
-            printf("Register %d updated, new value : %d.\n",value[1],result);
+            printf("Register %d updated, new value : %d.\n", value[1], result);
             // Update flags
             // Negative Flag
             negativeFlag = (result < 0);
@@ -178,7 +178,7 @@ void execute(int value[6])
         case 6: // OR Operation
             // Perform bitwise OR operation
             result = value[4] | value[5];
-            printf("Register %d updated, new value : %d.\n",value[1],result);
+            printf("Register %d updated, new value : %d.\n", value[1], result);
             // Update flags
             // Negative Flag
             negativeFlag = (result < 0);
@@ -197,7 +197,7 @@ void execute(int value[6])
         case 8: // Shift Left Circular Operation
             // Perform circular left shift operation
             result = (value[4] << value[3]) | (value[4] >> (8 - value[3]));
-            printf("Register %d updated, new value : %d.\n",value[1],result);
+            printf("Register %d updated, new value : %d.\n", value[1], result);
             result &= ~(0xFF << (8 - value[3])); // Clear any sign bits
             // Update flags
             // Negative Flag
@@ -212,7 +212,7 @@ void execute(int value[6])
         case 9: // Shift Right Circular Operation
             // Perform circular right shift operation
             result = (value[4] >> value[3]) & ~(0xFF << (8 - value[3])) | (value[4] << (8 - value[3]));
-             printf("Register %d updated, new value : %d.\n",value[1],result);
+            printf("Register %d updated, new value : %d.\n", value[1], result);
             // Update flags
             // Negative Flag
             negativeFlag = (result < 0);
@@ -226,13 +226,13 @@ void execute(int value[6])
         case 10: // LOAD Byte Operation
             // Load byte from Data Memory
             GPRS[value[1]] = DataMemory[value[3]];
-            printf("Register %d Loaded from Data Memory, new value  : %d.\n",value[1],DataMemory[value[3]]);
+            printf("Register %d Loaded from Data Memory, new value  : %d.\n", value[1], DataMemory[value[3]]);
             // No flags are affected
             break;
         case 11: // Store Byte Operation
             // Store byte to Data Memory
             DataMemory[value[3]] = value[4];
-            printf("Data Stored at index  %d in Data Memory, value  : %d.\n",value[3],value[4]);
+            printf("Data Stored at index  %d in Data Memory, value  : %d.\n", value[3], value[4]);
             // No flags are affected
             break;
         default:
@@ -252,8 +252,7 @@ void execute(int value[6])
     }
 }
 
-
-//from decimal to 6 bits binary string
+// from decimal to 6 bits binary string
 char binaryString[7];
 
 char *decimalToBinary(int decimal)
@@ -275,7 +274,7 @@ char *decimalToBinary(int decimal)
     return binaryString;
 }
 
-//From String to 16 bits for instruction memory
+// From String to 16 bits for instruction memory
 short int binaryToShort(char *binaryString)
 {
     short int result = 0;
@@ -298,7 +297,7 @@ int LoadInstruction()
     char *split;
     char *ptr;
     // Open CMakeLists.txt file
-     char filename[] = "CMakeLists.txt"; // Relative path to the file
+    char filename[] = "CMakeLists.txt"; // Relative path to the file
 
     // Open the file
     file = fopen(filename, "r");
@@ -311,7 +310,7 @@ int LoadInstruction()
     while (fgets(line, sizeof(line), file))
     {
 
-         if (strspn(line, " \t\n") == strlen(line))
+        if (strspn(line, " \t\n") == strlen(line))
         {
             // Line is empty, skip processing
             continue;
@@ -408,7 +407,7 @@ int LoadInstruction()
                         }
                     }
 
-                    //Add flag to check if immediate is valid according to above switch case of alu
+                    // Add flag to check if immediate is valid according to above switch case of alu
                     if (i == 1)
                     {
                         ptr = strchr(split, 'R');
@@ -459,9 +458,9 @@ void pipeline()
     for (pc; pc < 1024; i++)
     {
         if (empty3)
-                {
-                    break;
-                }
+        {
+            break;
+        }
         printf("Cycle %d :\n", i);
         if (!branch)
         {
@@ -492,26 +491,26 @@ void pipeline()
         printf("\n");
     }
     printf("Executed all loaded Instructions.\n");
-    //Register Prints
-    // for (int i = 0; i < j + 1; i++)
-    // {
-    //     printf("Register Value %d is : %d\n", i, GPRS[i]);
-    // }
-    // printf("PC value : %d\n",pc);
-    // printf("Last SREG valie : %d\n",SREG);
+    // Register Prints
+    //  for (int i = 0; i < j + 1; i++)
+    //  {
+    //      printf("Register Value %d is : %d\n", i, GPRS[i]);
+    //  }
+    //  printf("PC value : %d\n",pc);
+    //  printf("Last SREG valie : %d\n",SREG);
 
-    //Instruction Prints
-    // for (int i = 0; i < j+1; i++)
-    // {
-    //     printf("Instruction %d is : %d\n", i, instructionMemory[i]);
-    // }
+    // Instruction Prints
+    //  for (int i = 0; i < j+1; i++)
+    //  {
+    //      printf("Instruction %d is : %d\n", i, instructionMemory[i]);
+    //  }
 
-    //Data Memory Prints
-    // for (int i = 0; i < 2048; i++)
-    // {
-    //     printf("Data Memory %d is : %d\n", i, DataMemory[i]);
-    // }
-    // printf("%s\n", String);
+    // Data Memory Prints
+    //  for (int i = 0; i < 2048; i++)
+    //  {
+    //      printf("Data Memory %d is : %d\n", i, DataMemory[i]);
+    //  }
+    //  printf("%s\n", String);
 }
 
 int main()
