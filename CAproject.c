@@ -492,25 +492,25 @@ void pipeline()
     }
     printf("Executed all loaded Instructions.\n");
     // Register Prints
-    //  for (int i = 0; i < j + 1; i++)
-    //  {
-    //      printf("Register Value %d is : %d\n", i, GPRS[i]);
-    //  }
-    //  printf("PC value : %d\n",pc);
-    //  printf("Last SREG valie : %d\n",SREG);
+     for (int i = 0; i < j + 1; i++)
+     {
+         printf("Register Value %d is : %d\n", i, GPRS[i]);
+     }
+     printf("PC value : %d\n",pc);
+     printf("Last SREG valie : %d\n",SREG);
 
     // Instruction Prints
-    //  for (int i = 0; i < j+1; i++)
-    //  {
-    //      printf("Instruction %d is : %d\n", i, instructionMemory[i]);
-    //  }
+     for (int i = 0; i < j+1; i++)
+     {
+         printf("Instruction %d is : %d\n", i, instructionMemory[i]);
+     }
 
     // Data Memory Prints
-    //  for (int i = 0; i < 2048; i++)
-    //  {
-    //      printf("Data Memory %d is : %d\n", i, DataMemory[i]);
-    //  }
-    //  printf("%s\n", String);
+     for (int i = 0; i < 2048; i++)
+     {
+         printf("Data Memory %d is : %d\n", i, DataMemory[i]);
+     }
+     printf("%s\n", String);
 }
 
 int main()
