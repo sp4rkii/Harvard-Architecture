@@ -510,7 +510,7 @@ void pipeline()
      {
          printf("Data Memory %d is : %d\n", i, DataMemory[i]);
      }
-     printf("%s\n", String);
+     
 }
 
 int main()
