@@ -200,9 +200,8 @@ void execute(int value[6])
             break;
         case 8: // Shift Left Circular Operation
             // Perform circular left shift operation
-            result = (value[4] << value[3]) | (value[4] >> (8 - value[3]));
+           result = ((value[4] & 0xFF) << value[3]) | ((value[4] & 0xFF) >> (8 - value[3]));
             printf("Register %d updated, new value : %d.\n", value[1], result);
-            result &= ~(0xFF << (8 - value[3])); // Clear any sign bits
             // Update flags
             // Negative Flag
             negativeFlag = (result < 0);
