@@ -529,7 +529,7 @@ int LoadInstruction()
                 }
             }
             // Print loaded Instruction
-            printf("Instruction %d : %s\n", j, instruction);
+            // printf("Instruction %d : %s\n", j, instruction);
 
             short int temp = binaryToDecimal(instruction);
             // printf("Instruction %d : %d\n",j,temp);
@@ -582,25 +582,28 @@ void pipeline()
         printf("\n");
     }
     printf("Executed all loaded Instructions.\n");
+     printf("\n");
     // // Register Prints
-    //  for (int i = 0; i < j + 1; i++)
-    //  {
-    //      printf("Register Value %d is : %d\n", i, GPRS[i]);
-    //  }
-    //  printf("PC value : %d\n",pc);
-    //  printf("Last SREG value : %d\n",SREG);
-
+     for (int i = 0; i < 64; i++)
+     {
+         printf("Register Value %d is : %d\n", i, GPRS[i]);
+     }
+     printf("PC value : %d\n",pc);
+     printf("Last SREG value : %d\n",SREG);
+     printf("\n");
     // // Instruction Prints
-    //  for (int i = 0; i < j; i++)
-    //  {
-    //      printf("Instruction %d is : %d\n", i+1, instructionMemory[i]);
-    //  }
-
+     for (int i = 0; i < 1024; i++)
+     {   if(instructionMemory[i]==-4096 ){
+            break;
+        }
+         printf("Instruction %d is : %d\n", i+1, instructionMemory[i]);
+     }
+    printf("\n");
     // Data Memory Prints
-    //  for (int i = 0; i < 2048; i++)
-    //  {
-    //      printf("Data Memory %d is : %d\n", i, DataMemory[i]);
-    //  }
+     for (int i = 0; i < 31; i++)
+     {
+         printf("Data Memory %d is : %d\n", i, DataMemory[i]);
+     }
 }
 
 int main()
