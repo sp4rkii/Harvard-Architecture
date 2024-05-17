@@ -4,6 +4,8 @@
 #include <string.h>
 #include <stdbool.h>
 
+bool Iformat=false;
+bool Rformat=false;
 int pc = 0;
 short int instructionMemory[1024];
 int8_t DataMemory[2048];
@@ -373,50 +375,62 @@ int LoadInstruction()
                         if (strcmp(split, "ADD") == 0)
                         {
                             strcpy(instruction, "0000");
+                            Rformat=true;
                         }
                         else if (strcmp(split, "SUB") == 0)
                         {
                             strcpy(instruction, "0001");
+                             Rformat=true;
                         }
                         else if (strcmp(split, "MUL") == 0)
                         {
                             strcpy(instruction, "0010");
+                             Rformat=true;
                         }
                         else if (strcmp(split, "LDI") == 0)
                         {
                             strcpy(instruction, "0011");
+                            Iformat=true;
                         }
                         else if (strcmp(split, "BEQZ") == 0)
                         {
                             strcpy(instruction, "0100");
+                            Iformat=true;
                         }
                         else if (strcmp(split, "AND") == 0)
                         {
                             strcpy(instruction, "0101");
+                             Rformat=true;
                         }
                         else if (strcmp(split, "OR") == 0)
                         {
                             strcpy(instruction, "0110");
+                             Rformat=true;
                         }
                         else if (strcmp(split, "JR") == 0)
                         {
                             strcpy(instruction, "0111");
+                             Rformat=true;
                         }
                         else if (strcmp(split, "SLC") == 0)
                         {
                             strcpy(instruction, "1000");
+                            Iformat=true;
                         }
                         else if (strcmp(split, "SRC") == 0)
                         {
                             strcpy(instruction, "1001");
+                            Iformat=true;
                         }
                         else if (strcmp(split, "LB") == 0)
                         {
                             strcpy(instruction, "1010");
+                            Iformat=true;
                         }
                         else if (strcmp(split, "SB") == 0)
                         {
                             strcpy(instruction, "1011");
+                            Iformat=true;
                         }
                         else
                         {
@@ -454,22 +468,32 @@ int LoadInstruction()
                         {
                             // If 'R' is found, extract the number
                             int number = atoi(ptr + 1);
+                              if(Iformat){
+                                 printf("Invalid Language format, should be in I Format.\n");
+                                return 1;
+                            }
                             if (number > 63||number<0)
                             {
                                 printf("register number invalid\n");
                                 return 1;
                             }
+                    
                             char *binaryString = decimalToBinary(number);
                             strcat(instruction, binaryString);
                         }
                         else
                         {
                             int number = atoi(split);
+                              if(Rformat){
+                                 printf("Invalid Language format, should be in R Format.\n");
+                                return 1;
+                            }
                             if (number > 31 || number < -32)
                             {
                                 printf("immediate number more than 6 bits\n");
                                 return 1;
                             }
+                    
                             char *binaryString = decimalToBinary(number);
                             strcat(instruction, binaryString);
                         }
@@ -477,15 +501,18 @@ int LoadInstruction()
                     i--;
                     //         // Get the next token
                     split = strtok(NULL, " ");
+
                 }
             }
             //Print loaded Instruction
-            // printf("Instruction %d : %s\n", j, instruction);
+            printf("Instruction %d : %s\n", j, instruction);
 
             short int temp = binaryToDecimal(instruction);
             // printf("Instruction %d : %d\n",j,temp);
             instructionMemory[j] = temp;
             j++;
+            Rformat=false;
+            Iformat=false;
         }
     }
     fclose(file);
