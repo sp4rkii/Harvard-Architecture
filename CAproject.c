@@ -31,7 +31,7 @@ void Fetch()
     {
           if (branch & !empty)
         {
-            printf("Intruction %d fetched.\n", old + 1);
+            printf("Intruction %d fetched.\n",old + 1);
         }
         empty = true;
         instruction = -4096;
@@ -363,6 +363,7 @@ int LoadInstruction()
     char line[256];
     char *split;
     char *ptr;
+    bool address=false;
     // Open CMakeLists.txt file
     char filename[] = "CMakeLists.txt"; // Relative path to the file
 
@@ -452,12 +453,15 @@ int LoadInstruction()
                         {
                             strcpy(instruction, "1010");
                             Iformat = true;
+                            address=true;
                         }
                         else if (strcmp(split, "SB") == 0)
                         {
                             strcpy(instruction, "1011");
                             Iformat = true;
+                            address=true;
                         }
+
                         else
                         {
                             printf("Invalid operator entered\n");
@@ -516,10 +520,18 @@ int LoadInstruction()
                                 printf("Invalid Language format, should be in R Format.\n");
                                 return 1;
                             }
+                            if(address){
+                                if(number>63 || number<0){
+                                     printf("Address number more than 6 bits or invalid.\n");
+                                        return 1;
+                                }
+                            }
+                            else{
                             if (number > 31 || number < -32)
                             {
-                                printf("immediate number more than 6 bits\n");
+                                printf("immediate number more than 6 bits or invalid.\n");
                                 return 1;
+                            }
                             }
 
                             char *binaryString = decimalToBinary(number);
@@ -540,6 +552,7 @@ int LoadInstruction()
             j++;
             Rformat = false;
             Iformat = false;
+            address=false;
         }
     }
     fclose(file);
