@@ -12,6 +12,8 @@ int8_t SREG;
 short int instruction = -4096;
 int j = 0;
 bool empty = false;
+bool empty2 = false;
+bool empty3 = false;
 int value[6] = {-1, 0, 0, 0, 0, 0};
 char *String;
 bool branch;
@@ -21,10 +23,13 @@ char *decimalToBinary(int decimal);
 short int binaryToDecimal(const char *binaryString);
 void Fetch()
 {
-    if (instructionMemory[pc] == -4096)
+    if (pc>1023 || instructionMemory[pc] == -4096)
     {
         empty = true;
         instruction = -4096;
+        if(branch){
+            empty2=true;
+        }
     }
     //  strncpy(String, "Instruction %d executed \n",pc);
 
@@ -159,7 +164,7 @@ void execute(int value[6])
             if (value[4] == 0)
             {
                 // Update PC to immediate value
-                pc = pc + value[3]; // Not PC + 1 because it is already incremented in fetch()
+                pc = pc-1 + value[3]; // Not PC + 1 because it is already incremented in fetch()
                 branch = true;
                 printf("Branched to pc : %d.\n", pc);
             }
@@ -194,9 +199,9 @@ void execute(int value[6])
             break;
         case 7: // JUMP register Operation
             // Jump to the address stored in the given register
-            pc = value[4] || value[5];
+            pc = ((value[4] & 0xFF) << 8) | (value[5] & 0xFF);
             branch = true;
-              printf("Jumped to pc : %d.\n", pc);
+            printf("Jumped to pc : %d.\n", pc);
             break;
         case 8: // Shift Left Circular Operation
             // Perform circular left shift operation
@@ -488,8 +493,6 @@ int LoadInstruction()
 }
 void pipeline()
 {
-    bool empty2 = false;
-    bool empty3 = false;
     int i = 1;
     for (pc; pc < 1024; i++)
     {
@@ -551,8 +554,7 @@ void pipeline()
 
 int main()
 {
-     printf("%s\n", decimalToBinary(-30)); 
- printf("%d\n", binaryToDecimal( decimalToBinary(-30)));   // 001101
+     
     if (LoadInstruction() == 1)
     {
         return 0;
