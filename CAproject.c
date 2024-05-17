@@ -440,8 +440,9 @@ int LoadInstruction()
                     split = strtok(NULL, " ");
                 }
             }
+            //Print loaded Instruction
+            // printf("Instruction %d : %s\n", j, instruction);
 
-            printf("Instruction %d : %s\n", j, instruction);
             short int temp = binaryToShort(instruction);
             // printf("Instruction %d : %d\n",j,temp);
             instructionMemory[j] = temp;
@@ -449,6 +450,7 @@ int LoadInstruction()
         }
     }
     fclose(file);
+    printf("Instructions laoded Successfully.\n");
 }
 void pipeline()
 {
@@ -491,22 +493,22 @@ void pipeline()
         printf("\n");
     }
     printf("Executed all loaded Instructions.\n");
-    // Register Prints
-     for (int i = 0; i < j + 1; i++)
-     {
-         printf("Register Value %d is : %d\n", i, GPRS[i]);
-     }
-     printf("PC value : %d\n",pc);
-     printf("Last SREG value : %d\n",SREG);
+    // // Register Prints
+    //  for (int i = 0; i < j + 1; i++)
+    //  {
+    //      printf("Register Value %d is : %d\n", i, GPRS[i]);
+    //  }
+    //  printf("PC value : %d\n",pc);
+    //  printf("Last SREG value : %d\n",SREG);
 
-    // Instruction Prints
-     for (int i = 0; i < j+1; i++)
-     {
-         printf("Instruction %d is : %d\n", i, instructionMemory[i]);
-     }
+    // // Instruction Prints
+    //  for (int i = 0; i < j+1; i++)
+    //  {
+    //      printf("Instruction %d is : %d\n", i, instructionMemory[i]);
+    //  }
 
     // Data Memory Prints
-     for (int i = 0; i < 2048; i++)
+     for (int i = 0; i < 5; i++)
      {
          printf("Data Memory %d is : %d\n", i, DataMemory[i]);
      }
