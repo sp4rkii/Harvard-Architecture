@@ -17,6 +17,8 @@ char *String;
 bool branch;
 void decode(short int);
 void execute(int value[6]);
+char *decimalToBinary(int decimal);
+short int binaryToDecimal(const char *binaryString);
 void Fetch()
 {
     if (instructionMemory[pc] == -4096)
@@ -51,7 +53,7 @@ void decode(short int instruction)
         // R2
         value[2] = (instruction & 0b0000000000111111);
         // Immediate
-        value[3] = (instruction & 0b0000000000111111);
+        value[3] = binaryToDecimal( decimalToBinary((instruction & 0b0000000000111111)));
         // value inside register R1
         value[4] = GPRS[value[1]];
         // value inside register R2
@@ -159,6 +161,7 @@ void execute(int value[6])
                 // Update PC to immediate value
                 pc = pc + value[3]; // Not PC + 1 because it is already incremented in fetch()
                 branch = true;
+                printf("Branched to pc : %d.\n", pc);
             }
             break;
         case 5: // AND Operation
@@ -193,6 +196,7 @@ void execute(int value[6])
             // Jump to the address stored in the given register
             pc = value[4] || value[5];
             branch = true;
+              printf("Jumped to pc : %d.\n", pc);
             break;
         case 8: // Shift Left Circular Operation
             // Perform circular left shift operation
@@ -252,11 +256,17 @@ void execute(int value[6])
     }
 }
 
-// from decimal to 6 bits binary string
 char binaryString[7];
 
 char *decimalToBinary(int decimal)
 {
+    // Handle negative numbers for 6-bit two's complement
+    if (decimal < 0)
+    {
+        // Convert to positive equivalent for 6-bit two's complement
+        decimal = (1 << 6) + decimal;
+    }
+
     // Iterate through each bit position from left to right
     for (int i = 5; i >= 0; i--)
     {
@@ -274,17 +284,42 @@ char *decimalToBinary(int decimal)
     return binaryString;
 }
 
-// From String to 16 bits for instruction memory
-short int binaryToShort(char *binaryString)
+
+short int binaryToDecimal(const char *binaryString)
 {
-    short int result = 0;
     int length = strlen(binaryString);
-    for (int i = 0; i < length; i++)
+    int isNegative = binaryString[0] == '1';
+    short int decimal = 0;
+
+    // If the number is negative, convert using two's complement rules
+    if (isNegative)
     {
-        result = (result << 1) + (binaryString[i] - '0');
+        // Invert the bits and convert to integer
+        for (int i = 0; i < length; i++)
+        {
+            if (binaryString[i] == '0')
+            {
+                decimal += (1 << (length - 1 - i));
+            }
+        }
+        // Add 1 to the inverted bits value to get the magnitude
+        decimal = -(decimal + 1);
     }
-    return result;
+    else
+    {
+        // Directly convert positive binary number to decimal
+        for (int i = 0; i < length; i++)
+        {
+            if (binaryString[i] == '1')
+            {
+                decimal += (1 << (length - 1 - i));
+            }
+        }
+    }
+
+    return decimal;
 }
+
 
 int LoadInstruction()
 {
@@ -392,7 +427,7 @@ int LoadInstruction()
                         {
                             // If 'R' is found, extract the number
                             int number = atoi(ptr + 1);
-                            if (number > 63)
+                            if (number > 63||number<0)
                             {
                                 printf("register number invalid\n");
                                 return 1;
@@ -415,7 +450,7 @@ int LoadInstruction()
                         {
                             // If 'R' is found, extract the number
                             int number = atoi(ptr + 1);
-                            if (number > 63)
+                            if (number > 63||number<0)
                             {
                                 printf("register number invalid\n");
                                 return 1;
@@ -426,7 +461,7 @@ int LoadInstruction()
                         else
                         {
                             int number = atoi(split);
-                            if (number > 63)
+                            if (number > 31 || number < -32)
                             {
                                 printf("immediate number more than 6 bits\n");
                                 return 1;
@@ -443,7 +478,7 @@ int LoadInstruction()
             //Print loaded Instruction
             // printf("Instruction %d : %s\n", j, instruction);
 
-            short int temp = binaryToShort(instruction);
+            short int temp = binaryToDecimal(instruction);
             // printf("Instruction %d : %d\n",j,temp);
             instructionMemory[j] = temp;
             j++;
@@ -502,21 +537,23 @@ void pipeline()
     //  printf("Last SREG value : %d\n",SREG);
 
     // // Instruction Prints
-    //  for (int i = 0; i < j+1; i++)
+    //  for (int i = 0; i < j; i++)
     //  {
-    //      printf("Instruction %d is : %d\n", i, instructionMemory[i]);
+    //      printf("Instruction %d is : %d\n", i+1, instructionMemory[i]);
     //  }
 
     // Data Memory Prints
-     for (int i = 0; i < 5; i++)
-     {
-         printf("Data Memory %d is : %d\n", i, DataMemory[i]);
-     }
+    //  for (int i = 0; i < 2048; i++)
+    //  {
+    //      printf("Data Memory %d is : %d\n", i, DataMemory[i]);
+    //  }
      
 }
 
 int main()
 {
+     printf("%s\n", decimalToBinary(-30)); 
+ printf("%d\n", binaryToDecimal( decimalToBinary(-30)));   // 001101
     if (LoadInstruction() == 1)
     {
         return 0;
