@@ -622,7 +622,7 @@ void pipeline()
     }
     printf("\n");
     // Data Memory Prints
-    for (int i = 0; i < 31; i++)
+    for (int i = 0; i < 64; i++)
     {
         printf("Data Memory %d is : %d\n", i, DataMemory[i]);
     }
