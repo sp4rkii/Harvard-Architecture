@@ -29,12 +29,15 @@ void Fetch()
 {
     if (pc > 1023 || instructionMemory[pc] == -4096)
     {
+          if (branch & !empty)
+        {
+            printf("Intruction %d fetched.\n", old + 1);
+        }
         empty = true;
         instruction = -4096;
-        if (branch)
-        {
-            empty2 = true;
-        }
+      if(branch){
+         empty2 = true;
+      }
     }
     //  strncpy(String, "Instruction %d executed \n",pc);
 
