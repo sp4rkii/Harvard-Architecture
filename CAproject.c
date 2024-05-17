@@ -4,8 +4,9 @@
 #include <string.h>
 #include <stdbool.h>
 
-bool Iformat=false;
-bool Rformat=false;
+bool Iformat = false;
+bool Rformat = false;
+int old;
 int pc = 0;
 short int instructionMemory[1024];
 int8_t DataMemory[2048];
@@ -23,14 +24,16 @@ void decode(short int);
 void execute(int value[6]);
 char *decimalToBinary(int decimal);
 short int binaryToDecimal(const char *binaryString);
+
 void Fetch()
 {
-    if (pc>1023 || instructionMemory[pc] == -4096)
+    if (pc > 1023 || instructionMemory[pc] == -4096)
     {
         empty = true;
         instruction = -4096;
-        if(branch){
-            empty2=true;
+        if (branch)
+        {
+            empty2 = true;
         }
     }
     //  strncpy(String, "Instruction %d executed \n",pc);
@@ -38,10 +41,23 @@ void Fetch()
     else
     {
         instruction = instructionMemory[pc];
-        printf("Intruction %d fetched.\n", pc + 1);
+        if (branch)
+        {
+            instruction = instructionMemory[old];
+            printf("Intruction %d fetched.\n", old + 1);
+        }
+        else
+        {
+            printf("Intruction %d fetched.\n", pc + 1);
+        }
     }
     //  pc++;
     pc++;
+    if (branch)
+    {
+        instruction = -4096;
+        pc--;
+    }
 }
 
 void decode(short int instruction)
@@ -52,7 +68,14 @@ void decode(short int instruction)
     }
     else
     {
-        printf("Intruction %d decoded.\n", pc);
+        if (branch)
+        {
+            printf("Intruction %d decoded.\n", old);
+        }
+        else
+        {
+            printf("Intruction %d decoded.\n", pc);
+        }
         // Opcode
         value[0] = (instruction & 0b1111000000000000) >> 12;
         // R1
@@ -60,7 +83,7 @@ void decode(short int instruction)
         // R2
         value[2] = (instruction & 0b0000000000111111);
         // Immediate
-        value[3] = binaryToDecimal( decimalToBinary((instruction & 0b0000000000111111)));
+        value[3] = binaryToDecimal(decimalToBinary((instruction & 0b0000000000111111)));
         // value inside register R1
         value[4] = GPRS[value[1]];
         // value inside register R2
@@ -166,7 +189,8 @@ void execute(int value[6])
             if (value[4] == 0)
             {
                 // Update PC to immediate value
-                pc = pc-1 + value[3]; // Not PC + 1 because it is already incremented in fetch()
+                old = pc;
+                pc = pc - 1 + value[3]; // Not PC + 1 because it is already incremented in fetch()
                 branch = true;
                 printf("Branched to pc : %d.\n", pc);
             }
@@ -201,13 +225,14 @@ void execute(int value[6])
             break;
         case 7: // JUMP register Operation
             // Jump to the address stored in the given register
+            old = pc;
             pc = ((value[4] & 0xFF) << 8) | (value[5] & 0xFF);
             branch = true;
             printf("Jumped to pc : %d.\n", pc);
             break;
         case 8: // Shift Left Circular Operation
-            // Perform circular left shift operation
-           result = ((value[4] & 0xFF) << value[3]) | ((value[4] & 0xFF) >> (8 - value[3]));
+                // Perform circular left shift operation
+            result = ((value[4] & 0xFF) << value[3]) | ((value[4] & 0xFF) >> (8 - value[3]));
             printf("Register %d updated, new value : %d.\n", value[1], result);
             // Update flags
             // Negative Flag
@@ -290,7 +315,6 @@ char *decimalToBinary(int decimal)
     return binaryString;
 }
 
-
 short int binaryToDecimal(const char *binaryString)
 {
     int length = strlen(binaryString);
@@ -325,7 +349,6 @@ short int binaryToDecimal(const char *binaryString)
 
     return decimal;
 }
-
 
 int LoadInstruction()
 {
@@ -375,62 +398,62 @@ int LoadInstruction()
                         if (strcmp(split, "ADD") == 0)
                         {
                             strcpy(instruction, "0000");
-                            Rformat=true;
+                            Rformat = true;
                         }
                         else if (strcmp(split, "SUB") == 0)
                         {
                             strcpy(instruction, "0001");
-                             Rformat=true;
+                            Rformat = true;
                         }
                         else if (strcmp(split, "MUL") == 0)
                         {
                             strcpy(instruction, "0010");
-                             Rformat=true;
+                            Rformat = true;
                         }
                         else if (strcmp(split, "LDI") == 0)
                         {
                             strcpy(instruction, "0011");
-                            Iformat=true;
+                            Iformat = true;
                         }
                         else if (strcmp(split, "BEQZ") == 0)
                         {
                             strcpy(instruction, "0100");
-                            Iformat=true;
+                            Iformat = true;
                         }
                         else if (strcmp(split, "AND") == 0)
                         {
                             strcpy(instruction, "0101");
-                             Rformat=true;
+                            Rformat = true;
                         }
                         else if (strcmp(split, "OR") == 0)
                         {
                             strcpy(instruction, "0110");
-                             Rformat=true;
+                            Rformat = true;
                         }
                         else if (strcmp(split, "JR") == 0)
                         {
                             strcpy(instruction, "0111");
-                             Rformat=true;
+                            Rformat = true;
                         }
                         else if (strcmp(split, "SLC") == 0)
                         {
                             strcpy(instruction, "1000");
-                            Iformat=true;
+                            Iformat = true;
                         }
                         else if (strcmp(split, "SRC") == 0)
                         {
                             strcpy(instruction, "1001");
-                            Iformat=true;
+                            Iformat = true;
                         }
                         else if (strcmp(split, "LB") == 0)
                         {
                             strcpy(instruction, "1010");
-                            Iformat=true;
+                            Iformat = true;
                         }
                         else if (strcmp(split, "SB") == 0)
                         {
                             strcpy(instruction, "1011");
-                            Iformat=true;
+                            Iformat = true;
                         }
                         else
                         {
@@ -445,7 +468,7 @@ int LoadInstruction()
                         {
                             // If 'R' is found, extract the number
                             int number = atoi(ptr + 1);
-                            if (number > 63||number<0)
+                            if (number > 63 || number < 0)
                             {
                                 printf("register number invalid\n");
                                 return 1;
@@ -468,24 +491,26 @@ int LoadInstruction()
                         {
                             // If 'R' is found, extract the number
                             int number = atoi(ptr + 1);
-                              if(Iformat){
-                                 printf("Invalid Language format, should be in I Format.\n");
+                            if (Iformat)
+                            {
+                                printf("Invalid Language format, should be in I Format.\n");
                                 return 1;
                             }
-                            if (number > 63||number<0)
+                            if (number > 63 || number < 0)
                             {
                                 printf("register number invalid\n");
                                 return 1;
                             }
-                    
+
                             char *binaryString = decimalToBinary(number);
                             strcat(instruction, binaryString);
                         }
                         else
                         {
                             int number = atoi(split);
-                              if(Rformat){
-                                 printf("Invalid Language format, should be in R Format.\n");
+                            if (Rformat)
+                            {
+                                printf("Invalid Language format, should be in R Format.\n");
                                 return 1;
                             }
                             if (number > 31 || number < -32)
@@ -493,7 +518,7 @@ int LoadInstruction()
                                 printf("immediate number more than 6 bits\n");
                                 return 1;
                             }
-                    
+
                             char *binaryString = decimalToBinary(number);
                             strcat(instruction, binaryString);
                         }
@@ -501,18 +526,17 @@ int LoadInstruction()
                     i--;
                     //         // Get the next token
                     split = strtok(NULL, " ");
-
                 }
             }
-            //Print loaded Instruction
+            // Print loaded Instruction
             printf("Instruction %d : %s\n", j, instruction);
 
             short int temp = binaryToDecimal(instruction);
             // printf("Instruction %d : %d\n",j,temp);
             instructionMemory[j] = temp;
             j++;
-            Rformat=false;
-            Iformat=false;
+            Rformat = false;
+            Iformat = false;
         }
     }
     fclose(file);
@@ -521,6 +545,7 @@ int LoadInstruction()
 void pipeline()
 {
     int i = 1;
+    bool ignore = false;
     for (pc; pc < 1024; i++)
     {
         if (empty3)
@@ -535,16 +560,16 @@ void pipeline()
         else
         {
             branch = false;
+            ignore = true;
         }
 
         // if(branch){
         //     branch=false;
         //     Fetch();
         // }
-        if (!branch)
-        {
-            decode(instruction);
-        }
+
+        decode(instruction);
+
         Fetch();
         if (empty)
         {
@@ -576,12 +601,11 @@ void pipeline()
     //  {
     //      printf("Data Memory %d is : %d\n", i, DataMemory[i]);
     //  }
-     
 }
 
 int main()
 {
-     
+
     if (LoadInstruction() == 1)
     {
         return 0;
