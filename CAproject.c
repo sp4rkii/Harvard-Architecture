@@ -29,15 +29,16 @@ void Fetch()
 {
     if (pc > 1023 || instructionMemory[pc] == -4096)
     {
-          if (branch & !empty)
+        if (branch & !empty)
         {
-            printf("Intruction %d fetched.\n",old + 1);
+            printf("Intruction %d fetched.\n", old + 1);
         }
         empty = true;
         instruction = -4096;
-      if(branch){
-         empty2 = true;
-      }
+        if (branch)
+        {
+            empty2 = true;
+        }
     }
     //  strncpy(String, "Instruction %d executed \n",pc);
 
@@ -363,7 +364,7 @@ int LoadInstruction()
     char line[256];
     char *split;
     char *ptr;
-    bool address=false;
+    bool address = false;
     // Open CMakeLists.txt file
     char filename[] = "CMakeLists.txt"; // Relative path to the file
 
@@ -453,13 +454,13 @@ int LoadInstruction()
                         {
                             strcpy(instruction, "1010");
                             Iformat = true;
-                            address=true;
+                            address = true;
                         }
                         else if (strcmp(split, "SB") == 0)
                         {
                             strcpy(instruction, "1011");
                             Iformat = true;
-                            address=true;
+                            address = true;
                         }
 
                         else
@@ -520,18 +521,21 @@ int LoadInstruction()
                                 printf("Invalid Language format, should be in R Format.\n");
                                 return 1;
                             }
-                            if(address){
-                                if(number>63 || number<0){
-                                     printf("Address number more than 6 bits or invalid.\n");
-                                        return 1;
+                            if (address)
+                            {
+                                if (number > 63 || number < 0)
+                                {
+                                    printf("Address number more than 6 bits or invalid.\n");
+                                    return 1;
                                 }
                             }
-                            else{
-                            if (number > 31 || number < -32)
+                            else
                             {
-                                printf("immediate number more than 6 bits or invalid.\n");
-                                return 1;
-                            }
+                                if (number > 31 || number < -32)
+                                {
+                                    printf("immediate number more than 6 bits or invalid.\n");
+                                    return 1;
+                                }
                             }
 
                             char *binaryString = decimalToBinary(number);
@@ -552,7 +556,7 @@ int LoadInstruction()
             j++;
             Rformat = false;
             Iformat = false;
-            address=false;
+            address = false;
         }
     }
     fclose(file);
